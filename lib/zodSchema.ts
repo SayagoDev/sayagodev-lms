@@ -1,17 +1,17 @@
 import z from "zod";
 
-export const courseLevels = ["Beginner", "Intermediate", "Advanced"];
-export const courseStatus = ["Draft", "Published", "Archived"];
+export const courseLevels = ["Beginner", "Intermediate", "Advanced"] as const;
+export const courseStatus = ["Draft", "Published", "Archived"] as const;
 
 export const courseCategories = [
   "Development",
-  "Bussiness",
+  "Business",
   "Finance",
   "IT & Software",
   "Office Productivity",
   "Personal Development",
   "Design",
-  "Markegint",
+  "Marketing",
   "Music",
 ] as const;
 

@@ -15,7 +15,7 @@ import {
   CourseSchemaType,
   courseStatus,
 } from "@/lib/zodSchema";
-import { ArrowLeft, PlusIcon, SparkleIcon } from "lucide-react";
+import { ArrowLeft, Loader2, PlusIcon, SparkleIcon } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,8 +39,16 @@ import {
 } from "@/components/ui/select";
 import { RichTextEditor } from "@/components/rich-text-editor/Editor";
 import { Uploader } from "@/components/file-uploader/Uploader";
+import { useTransition } from "react";
+import { tryCatch } from "@/hooks/try-catch";
+import { CreateCourse } from "./actions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function CourseCreationPage() {
+  const [pending, startTransition] = useTransition();
+  const router = useRouter();
+
   const form = useForm({
     resolver: zodResolver(courseSchema),
     defaultValues: {
@@ -50,7 +58,7 @@ export default function CourseCreationPage() {
       price: 0,
       duration: 0,
       level: "Beginner",
-      category: "Bussiness",
+      category: "Business",
       smallDescription: "",
       slug: "",
       status: "Draft",
@@ -58,7 +66,25 @@ export default function CourseCreationPage() {
   });
 
   function onSubmit(values: CourseSchemaType) {
-    console.log(values);
+    startTransition(async () => {
+      const { data: result, error } = await tryCatch(CreateCourse(values));
+
+      if (error) {
+        console.log(error);
+        toast.error(
+          "Ocurrió un error inesperado. Por favor, inténtalo de nuevo."
+        );
+        return;
+      }
+
+      if (result.status === "success") {
+        toast.success(result.message);
+        form.reset();
+        router.push("/admin/courses");
+      } else if (result.status === "error") {
+        toast.error(result.message);
+      }
+    });
   }
 
   return (
@@ -165,7 +191,10 @@ export default function CourseCreationPage() {
                     <FormItem className="w-full">
                       <FormLabel>Miniatura</FormLabel>
                       <FormControl>
-                        <Uploader />
+                        <Uploader
+                          onChange={field.onChange}
+                          value={field.value}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -239,6 +268,7 @@ export default function CourseCreationPage() {
                             placeholder="Duración"
                             type="number"
                             {...field}
+                            value={field.value?.toString()}
                           />
                         </FormControl>
                         <FormMessage />
@@ -257,6 +287,7 @@ export default function CourseCreationPage() {
                             placeholder="Precio"
                             type="number"
                             {...field}
+                            value={field.value?.toString()}
                           />
                         </FormControl>
                         <FormMessage />
@@ -292,8 +323,17 @@ export default function CourseCreationPage() {
                   )}
                 />
 
-                <Button>
-                  Crear Curso <PlusIcon className="ml-1" size={16} />
+                <Button type="submit" disabled={pending}>
+                  {pending ? (
+                    <>
+                      Creando...
+                      <Loader2 className="animate-spin ml-1" />
+                    </>
+                  ) : (
+                    <>
+                      Crear Curso <PlusIcon className="ml-1" size={16} />
+                    </>
+                  )}
                 </Button>
               </form>
             </Form>
