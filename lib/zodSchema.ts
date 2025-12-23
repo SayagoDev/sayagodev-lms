@@ -47,4 +47,30 @@ export const courseSchema = z.object({
   status: z.enum(courseStatus, { message: "Estado del curso inválido" }),
 });
 
+export const chapterSchema = z.object({
+  name: z
+    .string()
+    .min(3, { message: "El nombre debe tener al menos 3 caracteres" }),
+  courseId: z.uuid({ message: "El ID del curso es inválido" }),
+});
+
+export const lessonSchema = z.object({
+  name: z
+    .string()
+    .min(3, { message: "El nombre debe tener al menos 3 caracteres" }),
+  courseId: z.uuid({ message: "El ID del curso es inválido" }),
+  chapterId: z.uuid({ message: "El ID del capítulo es inválido" }),
+  description: z
+    .string()
+    .min(3, { message: "La descripción debe tener al menos 3 caracteres" })
+    .optional(),
+  thumbnailKey: z
+    .string()
+    .min(1, { message: "Debes subir una imagen" })
+    .optional(),
+  videoKey: z.string().min(1, { message: "Debes subir un video" }).optional(),
+});
+
 export type CourseSchemaType = z.infer<typeof courseSchema>;
+export type ChapterSchemaType = z.infer<typeof chapterSchema>;
+export type LessonSchemaType = z.infer<typeof lessonSchema>;
