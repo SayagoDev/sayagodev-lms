@@ -27,7 +27,7 @@ export function RenderEmptyState({ isDragActive }: { isDragActive: boolean }) {
   );
 }
 
-export function RenderErrorState() {
+export function RenderErrorState({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="text-center">
       <div className="flex items-center mx-auto justify-center size-12 rounded-full bg-destructive/30 mb-4">
@@ -36,7 +36,12 @@ export function RenderErrorState() {
 
       <p className="text-base font-semibold">No se pudo subir este archivo</p>
       <p className="text-sm mt-1 text-muted-foreground">Algo salió mal</p>
-      <Button className="mt-4" type="button" variant="outline">
+      <Button
+        className="mt-4"
+        type="button"
+        variant="outline"
+        onClick={onRetry}
+      >
         Volver a subir archivos
       </Button>
     </div>
@@ -47,19 +52,25 @@ export function RenderUploadedState({
   previewUrl,
   isDeleting,
   handleRemoveFile,
+  fileType,
 }: {
   previewUrl: string;
   isDeleting: boolean;
   handleRemoveFile: () => void;
+  fileType: "image" | "video";
 }) {
   return (
-    <div>
-      <Image
-        src={previewUrl}
-        alt="Uploaded file"
-        fill
-        className="object-contain p-2"
-      />
+    <div className="relative group w-full h-full flex items-center justify-center">
+      {fileType === "video" ? (
+        <video src={previewUrl} controls className="rounded-md w-full h-full" />
+      ) : (
+        <Image
+          src={previewUrl}
+          alt="Uploaded file"
+          fill
+          className="object-contain p-2"
+        />
+      )}
       <Button
         variant="destructive"
         size="icon"
