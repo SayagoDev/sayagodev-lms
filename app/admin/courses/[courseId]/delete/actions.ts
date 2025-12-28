@@ -1,0 +1,30 @@
+"use server";
+
+import { requireAdmin } from "@/app/data/admin/require-admin";
+import { prisma } from "@/lib/db";
+import { APIResponse } from "@/lib/types";
+import { revalidatePath } from "next/cache";
+
+export async function deleteCourse(courseId: string): Promise<APIResponse> {
+  await requireAdmin();
+
+  try {
+    await prisma.course.delete({
+      where: {
+        id: courseId,
+      },
+    });
+
+    revalidatePath(`/admin/courses/`);
+
+    return {
+      status: "success",
+      message: "El curso se eliminó exitosamente",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Error al eliminar el curso",
+    };
+  }
+}
