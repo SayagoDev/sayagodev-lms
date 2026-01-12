@@ -30,9 +30,17 @@ interface iAppProps {
   value?: string;
   onChange?: (value: string) => void;
   fileTypeAccepted: "image" | "video";
+  onUploadComplete?: (key: string) => void;
+  onUploadStart?: (key: string) => void;
 }
 
-export function Uploader({ value, onChange, fileTypeAccepted }: iAppProps) {
+export function Uploader({
+  value,
+  onChange,
+  fileTypeAccepted,
+  onUploadStart,
+  onUploadComplete,
+}: iAppProps) {
   const fileUrl = value ? constructUrl(value) : undefined;
   const [fileState, setFileState] = useState<UploaderState>({
     error: false,
@@ -84,6 +92,14 @@ export function Uploader({ value, onChange, fileTypeAccepted }: iAppProps) {
           key: string;
         };
 
+        onUploadStart?.(key);
+
+        setFileState((prev) => ({
+          ...prev,
+          key: key,
+        }));
+        onChange?.(key);
+
         await new Promise<void>((resolve, reject) => {
           const xhr = new XMLHttpRequest();
 
@@ -104,10 +120,11 @@ export function Uploader({ value, onChange, fileTypeAccepted }: iAppProps) {
                 ...prev,
                 progress: 100,
                 uploading: false,
-                key: key,
               }));
-              onChange?.(key);
-              toast.success("Archivo subido correctamente");
+              if (!onUploadComplete) {
+                toast.success("Archivo subido correctamente");
+              }
+              onUploadComplete?.(key);
               resolve();
             } else {
               reject(new Error("Error al subir el archivo"));
@@ -132,7 +149,7 @@ export function Uploader({ value, onChange, fileTypeAccepted }: iAppProps) {
         }));
       }
     },
-    [fileTypeAccepted, onChange]
+    [fileTypeAccepted, onChange, onUploadComplete]
   );
 
   const onDrop = useCallback(

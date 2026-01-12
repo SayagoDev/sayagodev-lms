@@ -28,7 +28,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { updateLesson } from "../actions";
-import { useTransition } from "react";
+import { useEffect, useRef, useTransition } from "react";
 
 interface iAppProps {
   data: AdminLessonType;
@@ -50,6 +50,8 @@ export function LessonForm({ chapterId, courseId, data }: iAppProps) {
       videoKey: data.videoKey ?? undefined,
     },
   });
+
+  const currentVideoKey = form.watch("videoKey");
 
   function onSubmit(values: LessonSchemaType) {
     startTransition(async () => {
@@ -146,6 +148,25 @@ export function LessonForm({ chapterId, courseId, data }: iAppProps) {
                         onChange={field.onChange}
                         value={field.value}
                         fileTypeAccepted="video"
+                        onUploadStart={(key) => {
+                          toast.info(
+                            "Subiendo vídeo... Puedes guardar la lección mientras se sube"
+                          );
+                        }}
+                        onUploadComplete={(key) => {
+                          startTransition(async () => {
+                            const currentValues = form.getValues();
+                            const { data: result, error } = await tryCatch(
+                              updateLesson(currentValues, data.id)
+                            );
+
+                            if (!error && result.status === "success") {
+                              toast.success(
+                                "El vídeo se ha subido correctamente"
+                              );
+                            }
+                          });
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
