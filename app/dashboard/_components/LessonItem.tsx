@@ -28,11 +28,11 @@ export function LessonItem({
       href={`/dashboard/${slug}/${lesson.id}`}
       onClick={onLessonClick}
       className={buttonVariants({
-        variant: completed ? "secondary" : "outline",
+        variant: "outline",
         className: cn(
           "w-full p-2.5 h-auto justify-start transition-all",
           completed &&
-            "bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-800 dark:text-green-200",
+            "!bg-green-100 dark:!bg-green-900/30 !border-green-400 dark:!border-green-700 hover:!bg-green-100 dark:hover:!bg-green-900/50 !text-green-700 dark:!text-green-200",
           isActive &&
             !completed &&
             "bg-primary/10 dark:bg-primary/20 border-primary/50 hover:bg-primary/20 dark:hover:bg-primary/30 text-primary"
@@ -77,9 +77,15 @@ export function LessonItem({
           >
             {lesson.position}. {lesson.title}
           </p>
-          {completed && (
+          {completed && !isActive && (
             <p className="text-[10px] text-green-700 dark:text-green-300 font-medium">
               Completado
+            </p>
+          )}
+
+          {isActive && completed && (
+            <p className="text-[10px] text-green-700 dark:text-green-300 font-medium">
+              Completado | Viendo
             </p>
           )}
 
