@@ -17,6 +17,7 @@ const navigationItems = [
 
 export function Navbar() {
   const { data: session, isPending } = authClient.useSession();
+  const isAdmin = session?.user?.role === "admin";
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-[backdrop-filter]:bg-background/60">
@@ -53,6 +54,7 @@ export function Navbar() {
                   session?.user.image ??
                   `https://avatar.vercel.sh/${session?.user.email}`
                 }
+                isAdmin={isAdmin}
               />
             ) : (
               <>
@@ -85,6 +87,7 @@ export function Navbar() {
                 session?.user.image ??
                 `https://avatar.vercel.sh/${session?.user.email}`
               }
+              isAdmin={isAdmin}
             />
           ) : (
             <Link

@@ -43,13 +43,20 @@ import { useTransition } from "react";
 import { tryCatch } from "@/hooks/try-catch";
 import { CreateCourse } from "./actions";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useConfetti } from "@/hooks/use-confetti";
+import { authClient } from "@/lib/auth-client";
 
-export default function CourseCreationPage() {
+export default async function CourseCreationPage() {
   const [pending, startTransition] = useTransition();
   const router = useRouter();
   const { triggerConfetti } = useConfetti();
+
+  const session = await authClient.getSession();
+
+  if (session?.data?.user?.role !== "admin") {
+    redirect("/not-admin");
+  }
 
   const form = useForm({
     resolver: zodResolver(courseSchema),

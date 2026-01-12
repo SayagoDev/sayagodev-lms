@@ -24,9 +24,10 @@ interface iAppProps {
   name: string;
   email: string;
   image: string;
+  isAdmin: boolean;
 }
 
-export function UserDropdown({ name, email, image }: iAppProps) {
+export function UserDropdown({ name, email, image, isAdmin }: iAppProps) {
   const { handleSignOut } = useSignOut();
 
   return (
@@ -72,7 +73,7 @@ export function UserDropdown({ name, email, image }: iAppProps) {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/dashboard">
+            <Link href={isAdmin ? "/admin" : "/dashboard"}>
               <LayoutDashboardIcon
                 size={16}
                 className="opacity-60"
